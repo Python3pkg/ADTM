@@ -9,6 +9,10 @@
 #       http://www.alphaomega-technology.com.au/license/AOT-OL/1.0
 #==============================================================================
 
-from spsolver._info import *
 
-from spsolver._core import Reader, Writer
+class Reader(object):
+    pass
+
+
+class Writer(object):
+    pass
