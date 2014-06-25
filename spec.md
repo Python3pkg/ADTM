@@ -105,6 +105,10 @@ A `` ` `` character begins and ends a Forumla.
 
 ### 3.1 Header Line
 
+````
+HeaderLine = "=", { String, ":", Value / ( "," | ";" ) }, ? Newline or End Of File ? ; 
+````
+
 All files should have a header line as the first non-data line in the file indicating at least the File Format Version i.e. **version**.
 
 This Line is a List of key-value pairs.
@@ -123,4 +127,151 @@ If the first header line contains a **name** key then the file may contain multi
 
 Header lines following the first header line must not contain a **version** key
 
-###  3.2 Data Lines
+### 3.2 Special Values
+````
+SpecialValue = (* Case Insenstive *) ( "true" | "yes" | "on" | "false" | "no" | "off" | "none" | "null" ) ;
+````
+
+Idnefitier | Value 
+-----------|-------
+True       | True  
+Yes        | True  
+On         | True
+False      | False 
+No         | False
+Off        | False 
+None       | None  
+Null       | None
+
+These values are case insenstive the value is the equlivelent of the Python type.
+
+###  3.3 Strings
+
+Strings are a sequence of characters of arbatry length. String are normally required to be quoted however unquoted simple strings are allowed.
+
+````
+String = UnquotedString | QuotedString ;
+````
+
+#### Unquoted Strings
+
+````
+UnquotedString = ( SafeCharacter, { '.' | SafeCharacter } ) - SpecialValue ;
+SafeCharacter = '\' | '/' | '-' | '_' | 'a'..'f' | 'A'..'F' | '0'..'9' ;
+````
+In general any value that is a valid idenfitier in a programing language is a valid unquoted string.
+
+Unquoted string must not contain whitespace and must not be a reserved word used for Special Values.
+
+#### Quoted String
+
+````
+QuotedString = '"', { Character }, '"" ;
+Character = ? Any unicode character except \ or " ? | Escape | CodePoint ;
+Escape = '\', ( '"' | '\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' ) ;
+CodePoint = ( '\x', 2 * HexDigit ) | ( '\u', 4 * HexDigit ) | ( '\U', 8 * HexDigit ) ; 
+HexDigit = ( 'a'..'f' | 'A'..'F' | '0'..'9' ) ;
+````
+In effect a quoted string can contain any thing, ``\`` and ``"`` need to be escaped with a ``\`` as they respresent an escape sequence and the end of the string.
+
+##### Escape Sequences
+
+| Sequence | Meaning/Value
+|:--------:|--------------
+|  ``\"``  | Literal ``"``
+|  ``\\``  | Literal ``\``
+|  ``\/``  | Literal ``/``
+|  ``\b``  | Backspace
+|  ``\f``  | Formfeed
+|  ``\n``  | Newline
+|  ``\r``  | Carriage Return
+|  ``\t``  | Horziontal Tab
+| ``\x..`` | 1 Byte Code Point
+| ``\u..`` | 2 Byte Code Point
+| ``\U..`` | 4 Byte Code Point   
+
+### 3.4 Numbers
+
+There are 3 Numerical types are supported, Intergal, Real and Complex.
+
+````
+Number = Intergal | Real | Complex
+````
+
+#### Intergal
+
+````
+Interal = [ "-" | "+" ], { "0".."9" }+ ;
+````
+Intergal Numbers are any length sequence of digits optionally prefixed by a ``+`` or ``-``
+
+#### Real
+
+````
+Real = [ "-" | "+" ], ( ( { "0".."9" }+, ".", { "0".."9" } ) | ( ".", { "0".."9" }+ ) ), [ Expoent ] ;
+Expoent = ( "e" | "E" ), [ "-" | "+" ], { "0".."9" }+ ;
+````
+Real Numbers are Integals that have been extended with a fractional compoent and optional Expoent.
+
+#### Complex
+
+````
+Complex = [ Real ], ( Real (* Must have sign if optional real, is used *) ), ( "i" | "j" ) ;
+````
+Complex Numbers are just two Real numbers respresenting and Real and Imagnary Compoent, the Real Part is optional and the Imagnary Part must be followed by a ``i`` or ``j``.
+
+### 3.5 Lists
+
+````
+List = "[", { Value / ( "," | ";" ) }, "]" ;
+````
+Lists are a sequence of values seperated by ``,`` or ``;``, delimited by ``[`` and ``]``.
+
+### 3.5 Dictionary
+
+````
+Dictonary = "{", { String, ":", Value / ( "," | ";" ) }, "}" ;
+````
+Dictonaries are Name-Value Pair Lists, with String names and any value, delimited by ``{`` or ``}`` 
+
+### 3.6 Tags or Special Type
+
+The ``!`` symbol may be used to indicate the special interputation of the following value.
+
+````
+TaggedValue = "!", UnquotedString, ( [ Value - TaggedValue ] | ( "(" { Value / ( "," | ";" ) } ")" ) );
+````
+
+Note tags have both a prefix anf functional form, the prefix form acepts only 0 or 1 arguments, while the functional form takes a list of arguments. Prefix Tags can not be chained, while functional Tags can take values which include a Tag them self.
+
+#### Buildin Tags
+  Tag   | Meaning
+--------|--------
+!binary | Binary String, using base 64 encoding follows this tag, the value should be decode when the document is read.
+!int    | Intergal String Value
+!real   | Real String Value
+!float  | Real String Value
+!complex| Complex String Value, or 2 Reals
+!vec2   | Takes Two Numerical Values, respresents a Vector.
+!vec3   |  Takes Three Numerical Values, respresents a Vector.
+!point2 | Alais of !vec2, Should be used spefically for positions, offset from Orgin.
+!point3 | Alais of !vec3, Should be used spefically for positions, offset from Orgin.
+
+#### Custom Tags
+Custom Tags must be prefixed by a registered domain name, that you control, any other name is reserved for later usage.
+
+i.e. ``!yourdomainname.com/customtag``
+
+The path compounet of the URI need not exist however it is recomended it provide a spefication of the tags ussage and meaning.
+
+### 3.7 Values
+
+````
+Value = String | Number | List | Dictonary | SpecialValue | TaggedValue ;
+````
+
+### 3.8 Data Lines
+
+````
+DataLine = { Value / ( "," | ";" ) }, ? Newline or End Of File ? ; 
+````
