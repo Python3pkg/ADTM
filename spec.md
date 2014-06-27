@@ -127,6 +127,10 @@ If the first header line contains a **name** key then the file may contain multi
 
 Header lines following the first header line must not contain a **version** key
 
+#### Custom Keys
+
+See Section 3.11 Custom Idenfiters
+
 ### 3.2 Special Values
 ````
 SpecialValue = (* Case Insenstive *) ( "true" | "yes" | "on" | "false" | "no" | "off" | "none" | "null" ) ;
@@ -156,8 +160,8 @@ String = UnquotedString | QuotedString ;
 #### Unquoted Strings
 
 ````
-UnquotedString = ( SafeCharacter, { '.' | '-' | SafeCharacter } ) - SpecialValue ;
-SafeCharacter = '\' | '/' | '_' | 'a'..'f' | 'A'..'F' | '0'..'9' ;
+UnquotedString = ( SafeCharacter, { '.' | '-' | '0'..'9' | SafeCharacter } ) - SpecialValue ;
+SafeCharacter = '\' | '/' | '_' | 'a'..'f' | 'A'..'F' ;
 ````
 In general, any value that is a valid identifier in a programing language is a valid unquoted string.
 
@@ -247,7 +251,7 @@ Note tags have both a prefix and functional form; the prefix form accepts only z
 #### Build in Tags
   Tag   | Meaning
 --------|--------
-!binary | Binary String, using base 64 encoding follows this tag; the value should be decode when the document is read.
+!binary | Encoded Binary String.
 !int    | Integral String Value
 !real   | Real String Value
 !float  | Real String Value
@@ -259,11 +263,8 @@ Note tags have both a prefix and functional form; the prefix form accepts only z
 !formula| Formula String and optional recalculated value as second argument.
 
 #### Custom Tags
-Custom Tags must be prefixed by a registered domain name, that you control, any other name is reserved for later usage.
 
-i.e. ``!yourdomainname.com/customtag``
-
-The path component of the URI need not exist however; it is recommended it provide a speciation of the tags usage and meaning.
+See Section 3.11 Custom Idenfiters
 
 ### 3.7 Values
 
@@ -307,7 +308,19 @@ FieldTaggedValue = "!", UnquotedString, ( [ FieldValue - FieldTaggedValue ] | ( 
 
 Note the difference in the Tags for this line, prefix tags have no value as they implicitly prefix every value in the table, while function tags use ``$$`` to indicate a placeholder for the value. Field Tags must contain either the ``!formula`` tag or the ``$$`` placeholder. The Deepest level formula must be a relative formula so it can be applied to generate the values in the table. i.e. ``!formula("T[Field1]*T[Field2]-B1",$$)`` provides a table relative that uses an attribute value and indicate that the field contains precalculated values. This format is recommended whenever the value can be calculated from other data in the table, as it is more describe.
 
-### 3.10 Formula
+### 3.10 Custom Idenfiters
+
+Custom idenfitiers (tags and header keys) must be prefixed by a registered domain name, that you control, or path on a public domain you control, idenfitiers that don't contain a ``/`` must be defined in this specification. This forms a basic url with out the schema, port and other non meaning full features, in this context (as this is just a unique name).  
+
+URN's may also be used by replacing ``:`` with ``/``, the value ``urn`` is reserved in all cases for this ussage and will never be overriden.
+
+i.e. ``yourdomainname.com/tagname``, ``github.com/yourname/projectname/tagname``, ``code.google.com/p/projectname/tagname``, ``urn/isbn/isbnnumber``
+
+For the most part all these names should be valid Unquoted Strings, however there may exist case in which this is not possible, in such cases the idenfitier is invalid as a tag name as tag must be Unquoted Strings, however it can be used as a header key in Quoted form.
+
+Also valid for header keys are URN prefixes i.e. ``urn/isbn`` is a valid header key given the expected value is an isbn
+
+### 3.11 Formula
 
 In this version, there is no shorthand notation for Formula; later versions may introduce such notation. Hence formulas are introduce by the notation ``!formula("FORUMLA"[,result])`` or ``!formula "FORUMLA"``.
 
@@ -327,3 +340,21 @@ There is a third method of reference for tables with a header, only valid in the
 TCell = "T", "[", String, "]", [ "[", ( [ "+" | "-" ], { "0".."9" } | TFunc ), "]" ] ;
 TFunc = (* Case insensitive *) "Max" | "Min" | "Avg" | "Std" | "Sum" | "Count" ;
 ````
+
+### 3.12 Binary Strings
+
+Binary String are prefixed with the tag ``!binary``.
+
+Binary Strings must be encoded using url safe base 64 without padding (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**).
+
+Padding must be striped from the encode string on output.
+
+#### Other Encodings
+
+Base 16 and 32 encodings are also supported (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**), to use these encodings the string must be prefixed with ``/xx/``, where ``xx`` is the base.
+
+i.e. 
+``!binary QmluYXJ5IERhdGE`` is the string "Binary Data"
+``!binary /16/d41d8cd98f00b204e9800998ecf8427e`` for an md5 checksum
+
+Note Base 16 and 32 are always valid Unquoted Strings, Base 64 is only valid if it starts with a letter or a ``_``.
