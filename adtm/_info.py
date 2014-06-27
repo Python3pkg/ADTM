@@ -17,9 +17,9 @@ AlphaOmega Technology Open License Version 1.0\
  (http://www.alphaomega-technology.com.au/license/AOT-OL/1.0)"""
 __contact__ = "Glen Fletcher <glen.fletcher@alphaomega-technology.com.au>"
 __version__ = "1.0"
-__title__ = "JSOT"
+__title__ = "ADTM"
 __desc__ = """\
-JavaScript Object Table Format, Merging of CSV and JSON"""
+Adaptive Data Tabulation Markup, Merging of CSV and JSON"""
 __appname__ = "SPSolver"
 
 __all__ = [
