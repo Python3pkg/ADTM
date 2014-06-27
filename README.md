@@ -1,5 +1,5 @@
-JSOT
-====
+Adaptive Data Tabulation Markup
+===============================
 
 A Replacement for the nonuniform CSV, DSV, TSV type file formats for storing data tables based on JSON and YAML.
 

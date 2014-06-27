@@ -1,26 +1,26 @@
-JavaScript Object Table (JSOT) Version 1.0
-==========================================
+Adaptive Data Tabulation Markup (ADTM) Version 1.0
+==================================================
 
 #### Glen Fletcher
 [glen.fletcher@alphaomega-technology.com.au](mailto:glen.fletcher@alphaomega-technology.com.au)
 
 ## Chapter 1. Introduction
 
-JavaScript Object Table (abbreviated JSOT) is a table based data serialization language (file format) designed to be human-friendly, and work well for scientific data storage. This document provides a Complete Speciation of JSOT language.
+JavaScript Object Table (abbreviated ADTM) is a table based data serialization language (file format) designed to be human-friendly, and work well for scientific data storage. This document provides a Complete Speciation of ADTM language.
 
-JSOT takes concepts form existing text base table formats such as CSV as well as data serialization languages such as JSON and YAML.
+ADTM takes concepts form existing text base table formats such as CSV as well as data serialization languages such as JSON and YAML.
 
 ### 1.1 Goals
 
-The Design Goals for JSOT are:
+The Design Goals for ADTM are:
 
-1. JSOT is easily readable by humans.
-2. JSOT data is portable between programing languages.
-3. JSOT provides data structures similar to Spreadsheets.
-4. JSOT has a consistent model to support generic tools.
-5. JSOT is expressive and extensible.
-6. JSOT is easy to implement and use.
-7. JSOT support advance features seen in Spreadsheet software, found in most Office Suite.
+1. ADTM is easily readable by humans.
+2. ADTM data is portable between programing languages.
+3. ADTM provides data structures similar to Spreadsheets.
+4. ADTM has a consistent model to support generic tools.
+5. ADTM is expressive and extensible.
+6. ADTM is easy to implement and use.
+7. ADTM support advance features seen in Spreadsheet software, found in most Office Suite.
 	- Multiple Sheets/Documents in One File
 	- Storage of Formula and Data
 
@@ -30,7 +30,7 @@ CSV files provide tables delimited by commas and new lines. Other structure such
 
 JSON and YAML provide a human readable data interchange format. YAML is more readable while white space can always be removed from JSON.
 
-Both JSON and YAML provide List (Arrays), Dictionary’s (Hash/Maps), and Scalars (Numbers/Strings). In JSOT, a file contains data, which is considered a List of Lists.
+Both JSON and YAML provide List (Arrays), Dictionary’s (Hash/Maps), and Scalars (Numbers/Strings). In ADTM, a file contains data, which is considered a List of Lists.
 
 Each Sheet is a List of Lines where Each Line is a List of Objects, Similar to Inline YAML or JSON.
 
@@ -41,9 +41,9 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 ### 2.1 Character Set
 
-For readability JSOT files use only *printable* Unicode characters. The allowed character range explicitly excludes the C0 control block ``0x0-0x1F`` (except for TAB ``0x9``, LF ``0xA``, and CR ``0xD`` which are allowed), DEL ``0x7F``, the C1 control block ``0x80-0x9F`` (except for NEL ``0x85`` which is allowed), the surrogate block ``0xD800-0xDFFF``, ``0xFFFE``, and ``0xFFFF``.
+For readability ADTM files use only *printable* Unicode characters. The allowed character range explicitly excludes the C0 control block ``0x0-0x1F`` (except for TAB ``0x9``, LF ``0xA``, and CR ``0xD`` which are allowed), DEL ``0x7F``, the C1 control block ``0x80-0x9F`` (except for NEL ``0x85`` which is allowed), the surrogate block ``0xD800-0xDFFF``, ``0xFFFE``, and ``0xFFFF``.
 
-On input, a JSOT parser **MUST** accept all allowed characters it **MAY** accept non-allowed character.
+On input, a ADTM parser **MUST** accept all allowed characters it **MAY** accept non-allowed character.
 
 On output, any non-allowed characters **MUST** be escaped. Printable character **MAY** be escaped removing the need to check Unicode characters. Non-whitespace ASCII character **MUST NOT** be escaped except where they have special meaning in which case the only acceptable escape sequence is a backslash followed by the character itself.
 
@@ -53,7 +53,7 @@ All characters mentioned in this specification are Unicode code points. Each suc
 
 The character encoding is a presentation detail and **MUST NOT** be used to convey content information. 
 
-On Input the JSOT, processor **MUST** support UTF-8 character encoding. UTF-16 and UTF-32 **MAY** be supported.
+On Input the ADTM, processor **MUST** support UTF-8 character encoding. UTF-16 and UTF-32 **MAY** be supported.
 
 The document **MUST** begin with an ASCII character or a Byte Order Mark containing an ASCII character. A File not beginning with an ASCII character **MAY** be consider Invalid.
 
@@ -67,7 +67,7 @@ ASCII  | 0x00   | 0x00   | 0x00   | UTF-32LE
 ASCII  | 0x00   |        |        | UTF-16LE
 ASCII  |        |        |        | UTF-8 (default) 
 
-On Output the JSOT, processor **SHOULD** output UTF-8 without a BOM
+On Output the ADTM, processor **SHOULD** output UTF-8 without a BOM
 
 ### 2.3 Special Characters
 
@@ -317,7 +317,7 @@ Also valid for header keys are URN prefixes i.e. ``urn/isbn`` is a valid header 
 
 In this version, there is no shorthand notation for Formula; later versions **MAY** introduce such notation. Hence formulas are introduce by the notation ``!formula("FORUMLA"[,result])`` or ``!formula "FORUMLA"``.
 
-Most Spreadsheet program use a Cell notation of ``[ "$" ], { "A".."Z" }+, [ "$" ], { "0".."9" }+ ;`` with the ``$`` indicating the value is fixed when the formula is copied. This concept doesn’t make sense in JSOT format, as formula would be hard to read; hence, we define relative and absolute formula here.
+Most Spreadsheet program use a Cell notation of ``[ "$" ], { "A".."Z" }+, [ "$" ], { "0".."9" }+ ;`` with the ``$`` indicating the value is fixed when the formula is copied. This concept doesn’t make sense in ADTM format, as formula would be hard to read; hence, we define relative and absolute formula here.
 
 ````
 Cell = NCell | ACell ;
