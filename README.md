@@ -1,17 +1,12 @@
 JSOT
 ====
 
-A Replacement for the nonuniform CSV, DSV, TSV type file formats for storing data tables based on JSON.
+A Replacement for the nonuniform CSV, DSV, TSV type file formats for storing data tables based on JSON and YAML.
 
-A File can be condisered as a Array of Arrays,
-Each Line in the File shall be treated as a JSON Array i.e. `json.decode('[' + line[:-1] + ']')` is approximatly how a line may be read.
+This format has been desgined to support complex data types and provide methods of presentation for elexclent text base readablity.
 
-Extra Features
---------------
-
-- Support for Complex Numbers
 
 Specification
 =============
 
-see spec.md
+see [spec.md](https://github.com/alphaomega-technology/JSOT/blob/master/spec.md)
