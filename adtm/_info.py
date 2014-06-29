@@ -19,10 +19,9 @@ __contact__ = "Glen Fletcher <glen.fletcher@alphaomega-technology.com.au>"
 __version__ = "1.0"
 __title__ = "ADTM"
 __desc__ = """\
-Adaptive Data Tabulation Markup, Merging of CSV and JSON"""
-__appname__ = "SPSolver"
+Adaptive Data Tabulation Markup"""
 
 __all__ = [
         '__authors__', '__copyright__', '__license__',
         '__contact__', '__version__', '__title__',
-        '__desc__', '__appname__']
+        '__desc__']

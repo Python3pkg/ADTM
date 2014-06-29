@@ -14,7 +14,7 @@ from setuptools import setup, find_packages
 import os.path
 import re
 
-pkg_name = 'jsot'
+pkg_name = 'adtm'
 pkg = {}
 with open(os.path.join(pkg_name,'_info.py')) as f: exec(f.read(),pkg,pkg)
 
@@ -59,6 +59,8 @@ def readlist(fname):
 
 if '__appname__' in pkg:
     console_scripts = [pkg['__appname__'] + '=' + pkg_name + ".console:run"]
+else:
+    console_scripts = None
 
 entry_points = {}
 if console_scripts is not None:

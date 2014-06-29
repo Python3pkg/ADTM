@@ -4,6 +4,8 @@ Adaptive Data Tabulation Markup (ADTM) Version 1.0
 #### Glen Fletcher
 [glen.fletcher@alphaomega-technology.com.au](mailto:glen.fletcher@alphaomega-technology.com.au)
 
+Copyright &copy; 2014 Glen Fletcher (AlphaOmega Technology)<br />This document may be freely copied, provided it is not modified.
+
 ## Chapter 1. Introduction
 
 JavaScript Object Table (abbreviated ADTM) is a table based data serialization language (file format) designed to be human-friendly, and work well for scientific data storage. This document provides a Complete Speciation of ADTM language.
@@ -126,8 +128,14 @@ See Section 3.11 Custom Idenfiters
 
 ### 3.2 Special Values
 ````
-SpecialValue = (* Case Insenstive *) ( "true" | "yes" | "on" | "false" | "no" | "off" | "none" | "null" ) ;
+SpecialValue = BoolValue | NoneValue | SpecialNumber ;
+BoolValue = (* Case Insenstive *) ( "true" | "yes" | "on" | "false" | "no" | "off" ) ;
+NoneValue = (* Case Insenstive *) ( "none" | "null" ) ;
+SpecialNumber = (* Case Insenstive *) ( "nan" | "inf" | "infinity" | "-inf" | "-infinity" | "+inf" | "+infinity" ) ;
 ````
+**BoolValue**: Boolean values i.e. True or False.
+**NoneValue**: Respresents Nothing, i.e. a place holder for no value, or empty
+**SpecialNumber**: Respresents Special Numerical Values
 
 Identifier | Value 
 -----------|-------
@@ -137,10 +145,16 @@ On         | True
 False      | False 
 No         | False
 Off        | False 
-None       | None  
-Null       | None
+None       | Nothing  
+Null       | Nothing
+NaN        | Not A Number
+Inf        | Postive Infinity
+Infinity   | Postive Infinity
++Inf       | Postive Infinity
++Infinity  | Postive Infinity
+-Inf       | Negative Infinity
+-Infinity  | Negative Infinity
 
-These values are case insensitive the value is the equivalent of the Python type.
 
 ###  3.3 Strings
 
@@ -313,7 +327,97 @@ For the most part all these names **SHOULD** be valid Unquoted Strings, however 
 
 Also valid for header keys are URN prefixes i.e. ``urn/isbn`` is a valid header key given the expected value is an isbn
 
-### 3.11 Formula
+### 3.11 Binary Strings
+
+Binary String are prefixed with the tag ``!binary``.
+
+Binary Strings **MUST** be encoded using url safe base 64 without padding (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**).
+
+Padding **MUST** be striped from the encode string on output.
+
+#### Other Encodings
+
+Base 16 and 32 encodings are also supported (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**), to use these encodings the string **MUST** be prefixed with ``/xx/``, where ``xx`` is the base.
+
+i.e. 
+``!binary QmluYXJ5IERhdGE`` is the string "Binary Data"
+``!binary /16/d41d8cd98f00b204e9800998ecf8427e`` for an md5 checksum
+
+Note Base 16 and 32 are always valid Unquoted Strings, Base 64 is only valid if it starts with a letter or a ``_``.
+
+## Chapter 4. Document Presentation
+
+This chapter describes the **RECOMENDED** presentation style of ADTM documents, all requirements in this section are modified by this requirement level. This section is provide to describe how to produce easy to read documents.
+
+### 4.1 Tables with Fields (header: yes)
+
+For tables with a table header defining field names, the ``|`` seperator **MUST** be used, and all coloums **MUST** be fixed width.
+
+i.e.
+
+````
+ Field1 | Field2 | Field3
+  600   |  True  | "The First Row"
+  955   |  False | "The Second Row"
+   45   |  True  | "The Third Row"
+ 1000   |  True  | "The Fourth Row"
+````
+As Showen here when such a table is displayed using monospace fonts the coloums are aligned with the Field names in the header row, and the seperator acts to draw visual lines between the coloums this makes for a more readable document.
+
+To futher improve readablity every 2-6 lines a blank line or comment containing only the seperators **SHOULD** be added, the interval **SHOULD** be constant. Every 4-6 Intervals **SHOULD** use a comment line that repeats the fields names. (4 x 5 is **RECOMENDED**)
+
+i.e.
+
+````
+ Field1 | Field2 | Field3
+  600   |  True  | "The First Row"
+  955   |  False | "The Second Row"
+   45   |  True  | "The Third Row"
+ 1000   |  True  | "The Fourth Row"
+#       |        |               
+  600   |  True  | "The 2nd First Row"
+  955   |  False | "The 2nd Second Row"
+   45   |  True  | "The 2rdThird Row"
+ 1000   |  True  | "The 2nd Fourth Row"
+# ..... |        | ..... (jump a few intervals)
+#Field1 | Field2 | Field3
+  600   |  True  | "The 6th First Row"
+  955   |  False | "The 6th Second Row"
+   45   |  True  | "The 6th Third Row"
+ 1000   |  True  | "The 6th Fourth Row"
+#       |        |               
+  600   |  True  | "The 7th First Row"
+  955   |  False | "The 7th Second Row"
+   45   |  True  | "The 7th Third Row"
+ 1000   |  True  | "The 7th Fourth Row"               
+````  
+This allow for a long document to be easily read the blank lines help to isolate indivdual lines, and the repeated field name, allow for the field names to be always visible when reading the document in text format.
+
+### 4.2 Document Meta Data
+
+Often a table is respresenting some data set, it is useful to attach Meta Data to these tables. Here the Meta Data **MUST** be a the top of the document, using the **offset** value to shift the fields header down.
+
+Meta Data values should have a name associated with them, this **MUST** appear in the cell before the value and use the ``:`` seperator, if multiple values are associate they **MUST** be seperated by the ``,`` seperator. Where revlent the ``;`` seperator **MAY** be used to add another value to the line however this value **SHOULD** be related to the first value.
+i.e.
+
+````
+Range: 0, 100; Count: 5
+Name: "Name of dataset"
+Resolution: 500
+````
+By structuring the data in such a way it is easy to follow what the Meta Data is describing, the Names here tell a human what the value are. On the first line A Range of value, with a speficied count, i.e. 0,   25,   50,   75,  100 is describe, hence it uses the ``;`` seperator, the next two line are seperate as they aren't related to any of the other lines hence a Name followed by a value.
+
+Note: the Names here are not part of the ADTM spec, and stylist only, unless a more specific spec says otherwise the position of the values i.e. B1, C1, E1, B2, B3 are whats important.
+
+### 4.3 Field Names
+
+Field Names as describe in the previous two sections **SHOULD** always be an Unquoted String, think of them as an identifier for a variable.
+
+## Chapter 5. Forumla
+
+This chapter fullign describes the forumla type, incluing syntax and functions.
+
+### 5.1 Basic Syntax
 
 In this version, there is no shorthand notation for Formula; later versions **MAY** introduce such notation. Hence formulas are introduce by the notation ``!formula("FORUMLA"[,result])`` or ``!formula "FORUMLA"``.
 
@@ -334,20 +438,32 @@ TCell = "T", "[", String, "]", [ "[", ( [ "+" | "-" ], { "0".."9" } | TFunc ), "
 TFunc = (* Case insensitive *) "Max" | "Min" | "Avg" | "Std" | "Sum" | "Count" ;
 ````
 
-### 3.12 Binary Strings
+### 5.2 Operators
 
-Binary String are prefixed with the tag ``!binary``.
+Operator |    Order   | Operation
+--------:|:----------:|:----------
+minus sign ( - ) |     5      | Subtraction 
+plus sign ( + ) |     4      | Addition  
+asterisk ( * ) |     3      | Multiplication
+forward slash ( / ) |     2      | Division
+caret ( ^ ) |     1      | Exponentiation
 
-Binary Strings **MUST** be encoded using url safe base 64 without padding (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**).
+The Operators are applied base on the Listed Order
 
-Padding **MUST** be striped from the encode string on output.
+### 5.3 Brackets
 
-#### Other Encodings
+Brackets ``(`` and ``)`` may be used to alter the order of operators the content inside will be evaluated first.
 
-Base 16 and 32 encodings are also supported (see **[RFC 3548](http://tools.ietf.org/html/rfc3548.html)**), to use these encodings the string **MUST** be prefixed with ``/xx/``, where ``xx`` is the base.
+### 5.4 Functions
 
-i.e. 
-``!binary QmluYXJ5IERhdGE`` is the string "Binary Data"
-``!binary /16/d41d8cd98f00b204e9800998ecf8427e`` for an md5 checksum
+All Function names are case insenstive
 
-Note Base 16 and 32 are always valid Unquoted Strings, Base 64 is only valid if it starts with a letter or a ``_``.
+ Function | Description
+---------:|:-------------
+ **FLOOR**( number) | Round number down to the previous Integer
+ **CEIL**( number ) | Round number up to the next Integer
+ **ROUND**( number [, digits=0] ) | Round number to digits numer of decimal places.
+ **ROUNDDOWN**( number [, digits=0] ) | Round number down to digits numer of decimal places. 
+ **ROUNDUP**( number [, digits=0] ) | Round number up to digits numer of decimal places.
+ **ABS**( number ) | Absolute value of number
+  
