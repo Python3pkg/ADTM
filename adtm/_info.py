@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #==============================================================================
-#   Copyright 2014 AlphaOmega Technology
+#   Copyright 2015 AlphaOmega Technology
 #
 #   Licensed under the AlphaOmega Technology Open License Version 1.0
 #   You may not use this file except in compliance with this License.
@@ -11,7 +11,7 @@
 
 __authors__ = [
     ("Glen Fletcher", "glen.fletcher@alphaomega-technology.com.au")]
-__copyright__ = "(c) 2014, AlphaOmega Technology"
+__copyright__ = "(c) 2015, AlphaOmega Technology"
 __license__ = """\
 AlphaOmega Technology Open License Version 1.0\
  (http://www.alphaomega-technology.com.au/license/AOT-OL/1.0)"""
