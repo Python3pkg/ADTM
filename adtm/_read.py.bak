@@ -117,7 +117,7 @@ class AdtmTagError(AdtmReaderError):
     Special Error for invalid tags, contains tag name and args
     """
     def __init__(self, tag, tagargs, *args, **kwargs):
-        from ._write import EncodeObject
+        from _write import EncodeObject
         enc = EncodeObject()
         eargs = (enc(arg) for arg in tagargs)
         kwargs['value'] = "!{0:s}({1:s})".format(tag, ', '.join(eargs))
@@ -306,7 +306,7 @@ class DecodeObject(object):
 
     def _tag_binary(self, *args):
         import base64
-        if len(args) != 1 or not isinstance(args[0], str):
+        if len(args) != 1 or not isinstance(args[0], basestring):
             raise AdtmTagError('binary',
                                args,
                                self.line,

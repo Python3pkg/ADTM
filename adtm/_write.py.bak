@@ -54,13 +54,13 @@ class EncodeObject(object):
             if type(obj) is not types.InstanceType:  # New style inspect mro
                 mro = obj.__class__.__mro__
                 for adtmtype in mro:
-                    if adtmtype in list(_adtm_dumper.keys()):
+                    if adtmtype in _adtm_dumper.keys():
                         break
             else:  # old style class, only check __class__
                 adtmtype = obj.__class__
             out = "!" + _adtm_dumper[adtmtype][0] + " "
             out += _adtm_dumper[adtmtype][1](self, obj)
-        elif isinstance(obj, (str, bytes, bytearray)):
+        elif isinstance(obj, (basestring, bytes, bytearray)):
             out = self._encode_string(obj)
         elif isinstance(obj, numbers.Integral):
             out = "{0:d}".format(obj)
@@ -81,7 +81,7 @@ class EncodeObject(object):
         elif hasattr(obj, 'items') and hasattr(obj.items, '__call__'):
             out = '{'
             first = True
-            for k, v in list(obj.items()):
+            for k, v in obj.items():
                 if not first:
                     out += ','
                 else:
@@ -113,7 +113,7 @@ class EncodeObject(object):
 
     def _encode_string(self, string):
         if ((sys.version_info < (3,) and
-             isinstance(string, str)) or
+             isinstance(string, unicode)) or
             (sys.version_info >= (3,) and
              isinstance(string, str))):  # Unicode String
             return self._encode_unicode(string)
@@ -121,7 +121,7 @@ class EncodeObject(object):
             # Python 2.x
             try:
                 if 'encoding' in self.state:
-                    return self._encode_unicode(str(
+                    return self._encode_unicode(unicode(
                         string,
                         self.state['encoding'],
                         errors='strict'))
@@ -152,7 +152,7 @@ class EncodeObject(object):
                     out += "\\u{0:0>4s}".format(U)
                 else:
                     out += "\\U{0:0>8s}".format(U)
-            elif c in list(self._string_escape.keys()):
+            elif c in self._string_escape.keys():
                 out += self._string_escape[c]
             elif v < 0x1F:
                 out += "\\x{0:0>2s}".format(hex(v)[2:])
@@ -170,7 +170,7 @@ class EncodeObject(object):
             v = ord(c)
             if v > 127:
                 raise UnicodeError
-            elif c in list(self._string_escape.keys()):
+            elif c in self._string_escape.keys():
                 out += self._string_escape[c]
             elif v < 0x1F:
                 out += "\\x{0:0>2s}".format(hex(v)[2:])
@@ -222,12 +222,12 @@ class EncodeObject(object):
         if name is not None:
             fields['name'] = name
         if ext is not None and isinstance(ext, collections.Mapping):
-            for k, v in list(ext.items()):
+            for k, v in ext.items():
                 if k not in fields and '/' in k:
                     fields[k] = v
         out = '='
         first = True
-        for k, v in list(fields.items()):
+        for k, v in fields.items():
             if not first:
                 out += ';'
             else:
@@ -242,7 +242,7 @@ class EncodeObject(object):
         """
         out = ""
         if isinstance(item, tuple) and len(item) > 1:
-            if isinstance(item[0], (str, bytes, bytearray)):
+            if isinstance(item[0], (basestring, bytes, bytearray)):
                 out = self._encode_string(item[0])
                 out += ": "
                 out += ', '.join((self(i) for i in item[1:]))
